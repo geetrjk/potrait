@@ -3,7 +3,7 @@
 A professional ComfyUI project to integrate personal identities into diverse artistic styles and themed templates.
 
 ## GitHub Repository & Antigravity Alignment
-This project is centered around the GitHub repository `https://github.com/geetrjk/potrait.git`. All research, design, and production artifacts are version-controlled here, with normal Git-based practices managing branch changes, PR reviews, and deployments.
+This project is centered around the GitHub repository. All research, design, and production artifacts are version-controlled here, with normal Git-based practices managing branch changes, PR reviews, and deployments.
 
 The project structure is purposefully aligned with Google Antigravity style conventions:
 - **Project Directives**: Core principles (`GEMINI.md`, `AGENTS.md`) live correctly at the project root, automatically serving as global rules.
