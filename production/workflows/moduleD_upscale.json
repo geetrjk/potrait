@@ -1,0 +1,97 @@
+{
+  "id": "moduleD-upscale-v1",
+  "revision": 0,
+  "last_node_id": 4,
+  "last_link_id": 3,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [100, 300],
+      "size": [360, 446],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [1, 2]},
+        {"name": "MASK", "type": "MASK", "links": null}
+      ],
+      "title": "Load Harmonized Image (moduleC_harmonized)",
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "LoadImage"},
+      "widgets_values": ["moduleC_harmonized.png", "image"],
+      "color": "#222e40",
+      "bgcolor": "#364254"
+    },
+    {
+      "id": 2,
+      "type": "PreviewImage",
+      "pos": [550, 300],
+      "size": [360, 400],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 1}
+      ],
+      "outputs": [],
+      "title": "Preview Before Upscale",
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "PreviewImage"},
+      "widgets_values": []
+    },
+    {
+      "id": 3,
+      "type": "MarkdownNote",
+      "pos": [550, 750],
+      "size": [400, 200],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "⚠️ API Upscale Placeholder",
+      "properties": {},
+      "widgets_values": ["## Module D: API-Augmented Upscaling\n\nThis module is a **placeholder** for the Nano Banana Pro API upscale node.\n\n### To activate:\n1. Install the Nano Banana Pro custom node pack.\n2. Insert your `NANO_BANANA_API_KEY` from `.env`.\n3. Connect the LoadImage output to the API Upscale input.\n4. Route the API output to the SaveImage node below.\n\nThe final output should be saved as:\n`moduleD_final/moduleD_upscaled`"],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 4,
+      "type": "SaveImage",
+      "pos": [1000, 300],
+      "size": [360, 446],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 2}
+      ],
+      "outputs": [],
+      "title": "Save Final (Upscaled) Output",
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "SaveImage"},
+      "widgets_values": ["moduleD_final/moduleD_upscaled"]
+    }
+  ],
+  "links": [
+    [1, 1, 0, 2, 0, "IMAGE"],
+    [2, 1, 0, 4, 0, "IMAGE"]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "💎 Module D: API-Augmented Upscaling (Placeholder)",
+      "bounding": [50, 200, 1400, 850],
+      "color": "#7b1fa2",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7,
+      "offset": [50, 50]
+    }
+  },
+  "version": 0.4
+}

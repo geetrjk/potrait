@@ -1,0 +1,166 @@
+{
+  "id": "moduleB-identity-isolation-v1",
+  "revision": 0,
+  "last_node_id": 8,
+  "last_link_id": 7,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [100, 300],
+      "size": [360, 446],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [1]},
+        {"name": "MASK", "type": "MASK", "links": null}
+      ],
+      "title": "Load Normalized Subject (module0_subj)",
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "LoadImage"},
+      "widgets_values": ["module0_subj.png", "image"],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 2,
+      "type": "RMBG",
+      "pos": [550, 300],
+      "size": [340, 292],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {"name": "image", "type": "IMAGE", "link": 1}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [2, 4]},
+        {"name": "MASK", "type": "MASK", "links": [5]},
+        {"name": "MASK_IMAGE", "type": "IMAGE", "links": [3]}
+      ],
+      "title": "Remove Background (RMBG-2.0)",
+      "properties": {
+        "cnr_id": "comfyui-rmbg",
+        "ver": "d7402513f23f58db7d56754b02a4f51a148b4941",
+        "Node name for S&R": "RMBG"
+      },
+      "widgets_values": ["RMBG-2.0", 1, 1024, 0, 0, false, false, "Alpha", "#222222"],
+      "color": "#222e40",
+      "bgcolor": "#364254"
+    },
+    {
+      "id": 3,
+      "type": "AILab_CropObject",
+      "pos": [1000, 300],
+      "size": [300, 78],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {"name": "image", "type": "IMAGE", "link": 2, "shape": 7},
+        {"name": "mask", "type": "MASK", "link": null, "shape": 7}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [6]},
+        {"name": "MASK", "type": "MASK", "links": null}
+      ],
+      "title": "Crop Face Object",
+      "properties": {
+        "cnr_id": "comfyui-rmbg",
+        "Node name for S&R": "AILab_CropObject"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 4,
+      "type": "SaveImage",
+      "pos": [1400, 300],
+      "size": [360, 446],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 6}
+      ],
+      "outputs": [],
+      "title": "Save Cropped Face",
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "SaveImage"},
+      "widgets_values": ["moduleB_identity/moduleB_crop"]
+    },
+    {
+      "id": 5,
+      "type": "SaveImage",
+      "pos": [1000, 650],
+      "size": [360, 446],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 3}
+      ],
+      "outputs": [],
+      "title": "Save Mask Image",
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "SaveImage"},
+      "widgets_values": ["moduleB_identity/moduleB_mask"]
+    },
+    {
+      "id": 6,
+      "type": "SaveImage",
+      "pos": [550, 650],
+      "size": [360, 446],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 4}
+      ],
+      "outputs": [],
+      "title": "Save Full BG-Removed Image",
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "SaveImage"},
+      "widgets_values": ["moduleB_identity/moduleB_full_nobg"]
+    },
+    {
+      "id": 7,
+      "type": "PreviewImage",
+      "pos": [1400, 800],
+      "size": [360, 400],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 5}
+      ],
+      "outputs": [],
+      "title": "Preview Binary Mask",
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "PreviewImage"},
+      "widgets_values": []
+    }
+  ],
+  "links": [
+    [1, 1, 0, 2, 0, "IMAGE"],
+    [2, 2, 0, 3, 0, "IMAGE"],
+    [3, 2, 2, 5, 0, "IMAGE"],
+    [4, 2, 0, 6, 0, "IMAGE"],
+    [5, 2, 1, 7, 0, "MASK"],
+    [6, 3, 0, 4, 0, "IMAGE"]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "🧑 Module B: Identity Isolation",
+      "bounding": [50, 200, 1800, 1100],
+      "color": "#3a6e4f",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7,
+      "offset": [50, 50]
+    }
+  },
+  "version": 0.4
+}
