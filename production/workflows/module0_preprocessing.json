@@ -19,7 +19,7 @@
       ],
       "title": "Load Subject Image",
       "properties": {"cnr_id": "comfy-core", "Node name for S&R": "LoadImage"},
-      "widgets_values": ["subject.png", "image"],
+      "widgets_values": ["subject_5 year curly.webp", "image"],
       "color": "#232",
       "bgcolor": "#353"
     },
