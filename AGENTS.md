@@ -1,5 +1,23 @@
 # Project Agents
 
+Codex entrypoint: this file is the canonical instruction file for Codex in this
+repository. Gemini / Antigravity uses `GEMINI.md`. Shared cross-agent rules live
+in `docs/agent_contract.md`; follow them unless the user gives a newer direct
+instruction.
+
+## Workspace Identity and Goals
+
+**High-Level Goal:** Identity-consistent artistic generation.
+
+The objective is to build a professional system where any person's identity can
+be seamlessly integrated into artistic portraits, themed templates, and varied
+character styles using ComfyUI.
+
+**Core Principle:** Research MUST precede Architecture.
+
+No models, nodes, or architectures should be assumed a priori. All system design
+must be strictly derived from materials and data analyzed by the Research Lead.
+
 This document defines the specialized agents collaborating on this project.
 
 ## 1. Research Lead
@@ -21,3 +39,4 @@ Every Production Engineer MUST operate under the following remote-execution mand
 3. **Separate Concerns:** Never mix universal ComfyUI setup steps (e.g., cloning `rgthree`) with hardware-dependent hacks (e.g., forcing FP8 due to 12GB VRAM limits). Keep hardware-specific fixes rigidly isolated inside `docs/runbooks/02_hardware_profiles/`.
 4. **Record Every Success:** Any successful new software installation, path discovery, configuration fix, or operational workaround must be formally logged back into the `docs/runbooks/` repository before the end of the session.
 5. **Progressive Automation:** Convert verified, repeatable steps into parameterized infrastructure-as-code within `docs/runbooks/bootstrap.sh`.
+6. **Self-Verification First:** Agents *must* pull down and visually process the generated outputs (using native multimodal capabilities and compression where space is constrained) BEFORE requesting manual user verification. Only request a human verification (HITL) once the Agent considers it logically successful.

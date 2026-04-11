@@ -59,6 +59,8 @@ This document serves as the **Senior ComfyUI Architect's Blueprint** for transla
 ## Module C: Hybrid Harmonization (The Integration)
 **Purpose:** The critical blending block. Composites the cropped face, injects identity guidance, and inpaints the lighting.
 
+**Current verified implementation note:** The active workflow is a deterministic composite handoff, not the full AI inpaint design below. The Flux/KSampler inpaint path executed but produced a corrupted UI/screen artifact during live testing, so `production/workflows/moduleC_harmonization.json` now saves the verified `ImageCompositeMasked` output using the Module B source alpha, an oval trim mask, and `FeatherMask`. Reintroduce the inpaint path only as a separately tested redesign.
+
 *   **Primary Nodes Required:**
     *   `LoadImage` (Loading the Module A & B tracked outputs)
     *   `LayerUtility: ImageBlendAdvance V2` or `AILab_ImageCombiner`

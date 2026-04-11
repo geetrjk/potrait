@@ -1,397 +1,849 @@
 {
-  "id": "moduleC-harmonization-v1",
-  "revision": 0,
-  "last_node_id": 20,
-  "last_link_id": 25,
+  "id": "moduleC-composite-handoff-v4",
+  "revision": 3,
+  "last_node_id": 34,
+  "last_link_id": 48,
   "nodes": [
     {
       "id": 1,
       "type": "LoadImage",
-      "pos": [-1200, 300],
-      "size": [290, 392],
+      "pos": [
+        80,
+        140
+      ],
+      "size": [
+        360,
+        314
+      ],
       "flags": {},
       "order": 0,
       "mode": 0,
       "inputs": [],
       "outputs": [
-        {"name": "IMAGE", "type": "IMAGE", "links": [1, 24]},
-        {"name": "MASK", "type": "MASK", "links": [2]}
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            6
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
       ],
-      "title": "Load Target + Painted Mask (moduleA_base)",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "LoadImage"},
-      "widgets_values": ["moduleA_base.png", "image"],
-      "color": "#222e40",
-      "bgcolor": "#364254"
+      "title": "Load Normalized Target (module0_tgt)",
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "module0_tgt.png",
+        "image"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
     },
     {
       "id": 2,
-      "type": "UNETLoader",
-      "pos": [-1200, -100],
-      "size": [496, 82],
+      "type": "LoadImage",
+      "pos": [
+        80,
+        540
+      ],
+      "size": [
+        360,
+        314
+      ],
       "flags": {},
       "order": 1,
       "mode": 0,
       "inputs": [],
       "outputs": [
-        {"name": "MODEL", "type": "MODEL", "links": [3]}
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            2
+          ]
+        }
       ],
-      "title": "Load Flux 2 Klein 9B KV FP8",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "UNETLoader"},
-      "widgets_values": ["flux2/flux-2-klein-9b-kv-fp8.safetensors", "default"]
-    },
-    {
-      "id": 3,
-      "type": "FluxKVCache",
-      "pos": [-650, -100],
-      "size": [205, 26],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [
-        {"name": "model", "type": "MODEL", "link": 3}
+      "title": "Load Module B Subject Crop",
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "moduleB_crop.png",
+        "image"
       ],
-      "outputs": [
-        {"name": "MODEL", "type": "MODEL", "links": [4]}
-      ],
-      "title": "Enable KV Cache",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "FluxKVCache"},
-      "widgets_values": []
-    },
-    {
-      "id": 4,
-      "type": "CLIPLoader",
-      "pos": [-1200, 30],
-      "size": [461, 106],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {"name": "CLIP", "type": "CLIP", "links": [5]}
-      ],
-      "title": "Load CLIP (Qwen 3.8B FP8)",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "CLIPLoader"},
-      "widgets_values": ["qwen_3_8b_fp8mixed.safetensors", "flux2", "default"]
-    },
-    {
-      "id": 5,
-      "type": "VAELoader",
-      "pos": [-1200, 180],
-      "size": [270, 58],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {"name": "VAE", "type": "VAE", "links": [6, 7, 8]}
-      ],
-      "title": "Load Flux 2 VAE",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "VAELoader"},
-      "widgets_values": ["flux2-vae.safetensors"]
-    },
-    {
-      "id": 6,
-      "type": "CLIPTextEncode",
-      "pos": [-650, 30],
-      "size": [424, 293],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {"name": "clip", "type": "CLIP", "link": 5}
-      ],
-      "outputs": [
-        {"name": "CONDITIONING", "type": "CONDITIONING", "links": [9, 10]}
-      ],
-      "title": "Positive Prompt (Identity Harmonization)",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "CLIPTextEncode"},
-      "widgets_values": ["a portrait photo, natural skin texture, consistent lighting, seamless blend, high detail, sharp focus"],
       "color": "#232",
       "bgcolor": "#353"
     },
     {
+      "id": 3,
+      "type": "ImageCrop",
+      "pos": [
+        520,
+        500
+      ],
+      "size": [
+        300,
+        180
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 1
+        },
+        {
+          "name": "width",
+          "type": "INT"
+        },
+        {
+          "name": "height",
+          "type": "INT"
+        },
+        {
+          "name": "x",
+          "type": "INT"
+        },
+        {
+          "name": "y",
+          "type": "INT"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "title": "Crop Subject Head",
+      "properties": {
+        "Node name for S&R": "ImageCrop"
+      },
+      "widgets_values": [
+        635,
+        560,
+        185,
+        0
+      ]
+    },
+    {
+      "id": 4,
+      "type": "CropMask",
+      "pos": [
+        520,
+        720
+      ],
+      "size": [
+        300,
+        160
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 2
+        },
+        {
+          "name": "x",
+          "type": "INT"
+        },
+        {
+          "name": "y",
+          "type": "INT"
+        },
+        {
+          "name": "width",
+          "type": "INT"
+        },
+        {
+          "name": "height",
+          "type": "INT"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            3
+          ]
+        }
+      ],
+      "title": "Crop Subject Alpha Mask",
+      "properties": {
+        "Node name for S&R": "CropMask"
+      },
+      "widgets_values": [
+        185,
+        0,
+        635,
+        560
+      ]
+    },
+    {
+      "id": 5,
+      "type": "ResizeMask",
+      "pos": [
+        880,
+        720
+      ],
+      "size": [
+        340,
+        180
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 3
+        },
+        {
+          "name": "width",
+          "type": "INT"
+        },
+        {
+          "name": "height",
+          "type": "INT"
+        },
+        {
+          "name": "keep_proportions",
+          "type": "BOOLEAN"
+        },
+        {
+          "name": "upscale_method",
+          "type": "COMBO"
+        },
+        {
+          "name": "crop",
+          "type": "COMBO"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": [
+            4
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "title": "Resize Subject Mask",
+      "properties": {
+        "Node name for S&R": "ResizeMask"
+      },
+      "widgets_values": [
+        335,
+        296,
+        false,
+        "lanczos",
+        "disabled"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "InvertMask",
+      "pos": [
+        1260,
+        740
+      ],
+      "size": [
+        240,
+        80
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            42
+          ]
+        }
+      ],
+      "title": "Invert Source Alpha Mask",
+      "properties": {
+        "Node name for S&R": "InvertMask"
+      },
+      "widgets_values": []
+    },
+    {
       "id": 7,
-      "type": "ConditioningZeroOut",
-      "pos": [-150, 150],
-      "size": [204, 26],
+      "type": "ImageScale",
+      "pos": [
+        880,
+        500
+      ],
+      "size": [
+        340,
+        160
+      ],
       "flags": {},
       "order": 6,
       "mode": 0,
       "inputs": [
-        {"name": "conditioning", "type": "CONDITIONING", "link": 9}
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 5
+        },
+        {
+          "name": "upscale_method",
+          "type": "COMBO"
+        },
+        {
+          "name": "width",
+          "type": "INT"
+        },
+        {
+          "name": "height",
+          "type": "INT"
+        },
+        {
+          "name": "crop",
+          "type": "COMBO"
+        }
       ],
       "outputs": [
-        {"name": "CONDITIONING", "type": "CONDITIONING", "links": [11]}
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            7
+          ]
+        }
       ],
-      "title": "Zero-Out Negative",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "ConditioningZeroOut"},
-      "widgets_values": []
+      "title": "Resize Subject Head",
+      "properties": {
+        "Node name for S&R": "ImageScale"
+      },
+      "widgets_values": [
+        "lanczos",
+        335,
+        296,
+        "disabled"
+      ]
     },
     {
-      "id": 8,
-      "type": "InpaintCropImproved",
-      "pos": [-800, 500],
-      "size": [357, 650],
+      "id": 32,
+      "type": "CreateShapeMask",
+      "pos": [
+        1260,
+        900
+      ],
+      "size": [
+        360,
+        240
+      ],
       "flags": {},
       "order": 7,
       "mode": 0,
       "inputs": [
-        {"name": "image", "type": "IMAGE", "link": 1},
-        {"name": "mask", "type": "MASK", "link": 2, "shape": 7},
-        {"name": "optional_context_mask", "type": "MASK", "link": null, "shape": 7}
+        {
+          "name": "shape",
+          "type": "COMBO"
+        },
+        {
+          "name": "frames",
+          "type": "INT"
+        },
+        {
+          "name": "location_x",
+          "type": "INT"
+        },
+        {
+          "name": "location_y",
+          "type": "INT"
+        },
+        {
+          "name": "grow",
+          "type": "INT"
+        },
+        {
+          "name": "frame_width",
+          "type": "INT"
+        },
+        {
+          "name": "frame_height",
+          "type": "INT"
+        },
+        {
+          "name": "shape_width",
+          "type": "INT"
+        },
+        {
+          "name": "shape_height",
+          "type": "INT"
+        }
       ],
       "outputs": [
-        {"name": "stitcher", "type": "STITCHER", "links": [13]},
-        {"name": "cropped_image", "type": "IMAGE", "links": [14, 15, 16]},
-        {"name": "cropped_mask", "type": "MASK", "links": [17]}
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": [
+            43
+          ]
+        },
+        {
+          "name": "mask_inverted",
+          "type": "MASK",
+          "links": null
+        }
       ],
-      "title": "Crop Inpaint Region",
+      "title": "Source Oval Trim Mask",
       "properties": {
-        "cnr_id": "comfyui-inpaint-cropandstitch",
-        "Node name for S&R": "InpaintCropImproved"
+        "Node name for S&R": "CreateShapeMask"
       },
       "widgets_values": [
-        "bilinear", "bicubic", false, "ensure minimum resolution",
-        1024, 1024, 16384, 16384, true, 0, false, 32, 0.1,
-        false, 1, 1, 1, 1, 1.2, true, 1024, 1024, "32", "gpu (much faster)"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
+        "circle",
+        1,
+        168,
+        146,
+        0,
+        335,
+        296,
+        320,
+        270
+      ]
     },
     {
-      "id": 9,
-      "type": "VAEEncode",
-      "pos": [-300, 500],
-      "size": [140, 46],
+      "id": 33,
+      "type": "AILab_MaskCombiner",
+      "pos": [
+        1540,
+        760
+      ],
+      "size": [
+        300,
+        140
+      ],
       "flags": {},
       "order": 8,
       "mode": 0,
       "inputs": [
-        {"name": "pixels", "type": "IMAGE", "link": 16},
-        {"name": "vae", "type": "VAE", "link": 7}
+        {
+          "name": "mask_1",
+          "type": "MASK",
+          "link": 42
+        },
+        {
+          "name": "mode",
+          "type": "COMBO"
+        },
+        {
+          "name": "mask_2",
+          "type": "MASK",
+          "link": 43
+        },
+        {
+          "name": "mask_3",
+          "type": "MASK",
+          "link": null
+        },
+        {
+          "name": "mask_4",
+          "type": "MASK",
+          "link": null
+        }
       ],
       "outputs": [
-        {"name": "LATENT", "type": "LATENT", "links": [18, 19]}
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            44
+          ]
+        }
       ],
-      "title": "Encode Cropped to Latent",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "VAEEncode"},
-      "widgets_values": []
+      "title": "Intersect Source Alpha + Oval Trim",
+      "properties": {
+        "Node name for S&R": "AILab_MaskCombiner"
+      },
+      "widgets_values": [
+        "intersection"
+      ]
     },
     {
-      "id": 10,
-      "type": "ReferenceLatent",
-      "pos": [0, 50],
-      "size": [204, 46],
+      "id": 34,
+      "type": "FeatherMask",
+      "pos": [
+        1880,
+        520
+      ],
+      "size": [
+        300,
+        160
+      ],
       "flags": {},
       "order": 9,
       "mode": 0,
       "inputs": [
-        {"name": "conditioning", "type": "CONDITIONING", "link": 10},
-        {"name": "latent", "type": "LATENT", "link": 18, "shape": 7}
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 44
+        },
+        {
+          "name": "left",
+          "type": "INT"
+        },
+        {
+          "name": "top",
+          "type": "INT"
+        },
+        {
+          "name": "right",
+          "type": "INT"
+        },
+        {
+          "name": "bottom",
+          "type": "INT"
+        }
       ],
       "outputs": [
-        {"name": "CONDITIONING", "type": "CONDITIONING", "links": [20]}
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            45,
+            47
+          ]
+        }
       ],
-      "title": "Reference Latent (Positive)",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "ReferenceLatent"},
-      "widgets_values": []
+      "title": "Feather Final Composite Mask",
+      "properties": {
+        "Node name for S&R": "FeatherMask"
+      },
+      "widgets_values": [
+        8,
+        8,
+        8,
+        30
+      ]
     },
     {
-      "id": 11,
-      "type": "ReferenceLatent",
-      "pos": [0, 150],
-      "size": [204, 46],
+      "id": 8,
+      "type": "ImageCompositeMasked",
+      "pos": [
+        1540,
+        420
+      ],
+      "size": [
+        360,
+        220
+      ],
       "flags": {},
       "order": 10,
       "mode": 0,
       "inputs": [
-        {"name": "conditioning", "type": "CONDITIONING", "link": 11},
-        {"name": "latent", "type": "LATENT", "link": 19, "shape": 7}
+        {
+          "name": "destination",
+          "type": "IMAGE",
+          "link": 6
+        },
+        {
+          "name": "source",
+          "type": "IMAGE",
+          "link": 7
+        },
+        {
+          "name": "x",
+          "type": "INT"
+        },
+        {
+          "name": "y",
+          "type": "INT"
+        },
+        {
+          "name": "resize_source",
+          "type": "BOOLEAN"
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 45
+        }
       ],
       "outputs": [
-        {"name": "CONDITIONING", "type": "CONDITIONING", "links": [21]}
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            46
+          ]
+        }
       ],
-      "title": "Reference Latent (Negative)",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "ReferenceLatent"},
-      "widgets_values": []
+      "title": "Composite Subject Over Target (Verified Handoff)",
+      "properties": {
+        "Node name for S&R": "ImageCompositeMasked"
+      },
+      "widgets_values": [
+        395,
+        20,
+        false
+      ]
     },
     {
-      "id": 12,
-      "type": "InpaintModelConditioning",
-      "pos": [280, 50],
-      "size": [270, 138],
+      "id": 30,
+      "type": "MaskToImage",
+      "pos": [
+        1880,
+        760
+      ],
+      "size": [
+        240,
+        100
+      ],
       "flags": {},
       "order": 11,
       "mode": 0,
       "inputs": [
-        {"name": "positive", "type": "CONDITIONING", "link": 20},
-        {"name": "negative", "type": "CONDITIONING", "link": 21},
-        {"name": "vae", "type": "VAE", "link": 8},
-        {"name": "pixels", "type": "IMAGE", "link": 14},
-        {"name": "mask", "type": "MASK", "link": 17}
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 47
+        }
       ],
       "outputs": [
-        {"name": "positive", "type": "CONDITIONING", "links": [22]},
-        {"name": "negative", "type": "CONDITIONING", "links": [23]},
-        {"name": "latent", "type": "LATENT", "links": [12]}
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            48
+          ]
+        }
       ],
-      "title": "Inpaint Model Conditioning",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "InpaintModelConditioning"},
-      "widgets_values": [true]
+      "title": "Visualize Final Composite Mask",
+      "properties": {
+        "Node name for S&R": "MaskToImage"
+      },
+      "widgets_values": []
     },
     {
-      "id": 13,
-      "type": "KSampler",
-      "pos": [620, 30],
-      "size": [296, 262],
+      "id": 31,
+      "type": "PreviewImage",
+      "pos": [
+        2220,
+        720
+      ],
+      "size": [
+        260,
+        220
+      ],
       "flags": {},
       "order": 12,
       "mode": 0,
       "inputs": [
-        {"name": "model", "type": "MODEL", "link": 4},
-        {"name": "positive", "type": "CONDITIONING", "link": 22},
-        {"name": "negative", "type": "CONDITIONING", "link": 23},
-        {"name": "latent_image", "type": "LATENT", "link": 12}
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 48
+        }
       ],
-      "outputs": [
-        {"name": "LATENT", "type": "LATENT", "links": [25]}
-      ],
-      "title": "KSampler (Identity Inpaint)",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "KSampler"},
-      "widgets_values": [42, "randomize", 4, 1, "euler", "simple", 0.65],
-      "color": "#432",
-      "bgcolor": "#653"
+      "outputs": [],
+      "title": "Preview Final Composite Mask",
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
     },
     {
-      "id": 14,
-      "type": "VAEDecode",
-      "pos": [980, 30],
-      "size": [140, 46],
+      "id": 25,
+      "type": "SaveImage",
+      "pos": [
+        2220,
+        500
+      ],
+      "size": [
+        300,
+        100
+      ],
       "flags": {},
       "order": 13,
       "mode": 0,
       "inputs": [
-        {"name": "samples", "type": "LATENT", "link": 25},
-        {"name": "vae", "type": "VAE", "link": 6}
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 46
+        }
       ],
-      "outputs": [
-        {"name": "IMAGE", "type": "IMAGE", "links": [26]}
-      ],
-      "title": "Decode Latent to Pixels",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "VAEDecode"},
-      "widgets_values": []
-    },
-    {
-      "id": 15,
-      "type": "InpaintStitchImproved",
-      "pos": [1180, 30],
-      "size": [172, 46],
-      "flags": {},
-      "order": 14,
-      "mode": 0,
-      "inputs": [
-        {"name": "stitcher", "type": "STITCHER", "link": 13},
-        {"name": "inpainted_image", "type": "IMAGE", "link": 26}
-      ],
-      "outputs": [
-        {"name": "image", "type": "IMAGE", "links": [27, 28]}
-      ],
-      "title": "Stitch Back into Full Image",
+      "outputs": [],
+      "title": "Save Module C Composite Handoff",
       "properties": {
-        "cnr_id": "comfyui-inpaint-cropandstitch",
-        "Node name for S&R": "InpaintStitchImproved"
+        "Node name for S&R": "SaveImage"
       },
-      "widgets_values": []
-    },
-    {
-      "id": 16,
-      "type": "SaveImage",
-      "pos": [1420, 30],
-      "size": [455, 520],
-      "flags": {},
-      "order": 15,
-      "mode": 0,
-      "inputs": [
-        {"name": "images", "type": "IMAGE", "link": 27}
-      ],
-      "outputs": [],
-      "title": "Save Harmonized Result",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "SaveImage"},
-      "widgets_values": ["moduleC_composite/moduleC_harmonized"]
-    },
-    {
-      "id": 17,
-      "type": "Image Comparer (rgthree)",
-      "pos": [1420, 600],
-      "size": [460, 510],
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {"name": "image_a", "type": "IMAGE", "link": 24, "dir": 3},
-        {"name": "image_b", "type": "IMAGE", "link": 28, "dir": 3}
-      ],
-      "outputs": [],
-      "title": "Compare: Original vs Harmonized",
-      "properties": {
-        "cnr_id": "rgthree-comfy",
-        "comparer_mode": "Slide"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 18,
-      "type": "PreviewImage",
-      "pos": [-300, 700],
-      "size": [328, 342],
-      "flags": {},
-      "order": 17,
-      "mode": 0,
-      "inputs": [
-        {"name": "images", "type": "IMAGE", "link": 15}
-      ],
-      "outputs": [],
-      "title": "Preview Cropped Inpaint Region",
-      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "PreviewImage"},
-      "widgets_values": []
+      "widgets_values": [
+        "moduleC_composite/moduleC_harmonized"
+      ]
     }
   ],
   "links": [
-    [1,  1, 0, 8,  0, "IMAGE"],
-    [2,  1, 1, 8,  1, "MASK"],
-    [3,  2, 0, 3,  0, "MODEL"],
-    [4,  3, 0, 13, 0, "MODEL"],
-    [5,  4, 0, 6,  0, "CLIP"],
-    [6,  5, 0, 14, 1, "VAE"],
-    [7,  5, 0, 9,  1, "VAE"],
-    [8,  5, 0, 12, 2, "VAE"],
-    [9,  6, 0, 7,  0, "CONDITIONING"],
-    [10, 6, 0, 10, 0, "CONDITIONING"],
-    [11, 7, 0, 11, 0, "CONDITIONING"],
-    [12, 12, 2, 13, 3, "LATENT"],
-    [13, 8, 0, 15, 0, "STITCHER"],
-    [14, 8, 1, 12, 3, "IMAGE"],
-    [15, 8, 1, 18, 0, "IMAGE"],
-    [16, 8, 1, 9,  0, "IMAGE"],
-    [17, 8, 2, 12, 4, "MASK"],
-    [18, 9, 0, 10, 1, "LATENT"],
-    [19, 9, 0, 11, 1, "LATENT"],
-    [20, 10, 0, 12, 0, "CONDITIONING"],
-    [21, 11, 0, 12, 1, "CONDITIONING"],
-    [22, 12, 0, 13, 1, "CONDITIONING"],
-    [23, 12, 1, 13, 2, "CONDITIONING"],
-    [24, 1,  0, 17, 0, "IMAGE"],
-    [25, 13, 0, 14, 0, "LATENT"],
-    [26, 14, 0, 15, 1, "IMAGE"],
-    [27, 15, 0, 16, 0, "IMAGE"],
-    [28, 15, 0, 17, 1, "IMAGE"]
+    [
+      1,
+      2,
+      0,
+      3,
+      0,
+      "IMAGE"
+    ],
+    [
+      2,
+      2,
+      1,
+      4,
+      0,
+      "MASK"
+    ],
+    [
+      3,
+      4,
+      0,
+      5,
+      0,
+      "MASK"
+    ],
+    [
+      4,
+      5,
+      0,
+      6,
+      0,
+      "MASK"
+    ],
+    [
+      5,
+      3,
+      0,
+      7,
+      0,
+      "IMAGE"
+    ],
+    [
+      6,
+      1,
+      0,
+      8,
+      0,
+      "IMAGE"
+    ],
+    [
+      7,
+      7,
+      0,
+      8,
+      1,
+      "IMAGE"
+    ],
+    [
+      42,
+      6,
+      0,
+      33,
+      0,
+      "MASK"
+    ],
+    [
+      43,
+      32,
+      0,
+      33,
+      2,
+      "MASK"
+    ],
+    [
+      44,
+      33,
+      0,
+      34,
+      0,
+      "MASK"
+    ],
+    [
+      45,
+      34,
+      0,
+      8,
+      5,
+      "MASK"
+    ],
+    [
+      46,
+      8,
+      0,
+      25,
+      0,
+      "IMAGE"
+    ],
+    [
+      47,
+      34,
+      0,
+      30,
+      0,
+      "MASK"
+    ],
+    [
+      48,
+      30,
+      0,
+      31,
+      0,
+      "IMAGE"
+    ]
   ],
   "groups": [
     {
       "id": 1,
-      "title": "🔥 Module C: Hybrid Harmonization (Flux 2 Klein Inpaint)",
-      "bounding": [-1300, -200, 3200, 1400],
-      "color": "#8e4a2a",
+      "title": "Module C: Verified Composite Handoff (AI inpaint disabled)",
+      "bounding": [
+        40,
+        80,
+        2600,
+        1100
+      ],
+      "color": "#704c2b",
       "font_size": 24,
       "flags": {}
     }
@@ -399,8 +851,11 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.5,
-      "offset": [1300, 250]
+      "scale": 0.45,
+      "offset": [
+        20,
+        40
+      ]
     }
   },
   "version": 0.4
