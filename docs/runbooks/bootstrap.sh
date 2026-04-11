@@ -1,13 +1,9 @@
 #!/bin/bash
 # =============================================================================
-# SimplePod Bootstrap Script — Infrastructure Agnostic Core
+# SimplePod Bootstrap Script — Infrastructure Agnostic Core (Idempotent V2)
 # =============================================================================
-# This script automates the full setup of a fresh ComfyUI container for the
-# portrait pipeline. It is designed to be dynamically driven by the Agent's
-# pre-execution hardware profiling checks.
-#
-# Usage (from local machine):
-#   .venv/bin/python pod_ssh.py run "bash -s" < docs/runbooks/bootstrap.sh
+# Usage:
+#   bash /tmp/bootstrap.sh /app/ComfyUI true
 # =============================================================================
 
 set -e
@@ -15,25 +11,20 @@ set -e
 COMFY_ROOT="${1:-/app/ComfyUI}"
 CUSTOM_NODES="${COMFY_ROOT}/custom_nodes"
 MODELS="${COMFY_ROOT}/models"
-
-# Optional precision flag from hardware profiles
 USE_FP8="${2:-false}"
 
-echo "=============================================="
-echo "  Bootstrap: ComfyUI Infrastructure Agnostic"
-echo "=============================================="
+echo "[START] Bootstrap Pipeline Initialization"
 
 # --- Step 1: Verification ---
-echo "[1/5] Verifying ComfyUI installation..."
+echo "[START] Step 1: Verification"
 if [ ! -d "$COMFY_ROOT" ]; then
-    echo "ERROR: ComfyUI not found at $COMFY_ROOT"
+    echo "[ERROR] ComfyUI not found at $COMFY_ROOT"
     exit 1
 fi
-echo "  ✅ Server detected at $COMFY_ROOT"
+echo "[SUCCESS] Server detected at $COMFY_ROOT"
 
 # --- Step 2: Custom Node Installations ---
-echo ""
-echo "[2/5] Cloning validated extensions..."
+echo "[START] Step 2: Custom Node Integrations"
 cd "$CUSTOM_NODES"
 
 declare -A NODES
@@ -41,68 +32,81 @@ NODES["ComfyUI-RMBG"]="https://github.com/1038lab/ComfyUI-RMBG.git"
 NODES["ComfyUI-Inpaint-CropAndStitch"]="https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git"
 NODES["rgthree-comfy"]="https://github.com/rgthree/rgthree-comfy.git"
 NODES["ComfyUI-KJNodes"]="https://github.com/kijai/ComfyUI-KJNodes.git"
-
+NODES["ComfyUI-Impact-Pack"]="https://github.com/ltdrdata/ComfyUI-Impact-Pack.git"
+NODES["ComfyUI-ReActor"]="https://github.com/Gourieff/ComfyUI-ReActor.git"
 for name in "${!NODES[@]}"; do
     if [ -d "$name" ]; then
-        echo "  ⏭️  $name already installed."
+        if [ ! -d "$name/.git" ]; then
+            echo "  ⚠️  Corrupted clone detected for $name. Purging..."
+            rm -rf "$name"
+            echo "  📦 Re-cloning $name..."
+            git clone "${NODES[$name]}" "$name"
+            echo "  [SUCCESS] $name clone complete."
+        else
+            echo "  [SUCCESS] $name already exists and is healthy."
+        fi
     else
         echo "  📦 Cloning $name..."
-        git clone "${NODES[$name]}" 2>&1 | tail -1
-        echo "  ✅ Installed."
+        git clone "${NODES[$name]}" "$name"
+        echo "  [SUCCESS] $name clone complete."
     fi
 done
 
 # --- Step 3: Python Environment Mapping ---
-echo ""
-echo "[3/5] Syncing internal Python logic..."
+echo "[START] Step 3: Python Environment Sync"
 
 if [ -f "$CUSTOM_NODES/ComfyUI-RMBG/requirements.txt" ]; then
-    pip install -r "$CUSTOM_NODES/ComfyUI-RMBG/requirements.txt" --quiet 2>&1 | tail -3
+    pip install -r "$CUSTOM_NODES/ComfyUI-RMBG/requirements.txt" --quiet
 fi
-
 if [ -f "$CUSTOM_NODES/ComfyUI-KJNodes/requirements.txt" ]; then
-    pip install -r "$CUSTOM_NODES/ComfyUI-KJNodes/requirements.txt" --quiet 2>&1 | tail -3
+    pip install -r "$CUSTOM_NODES/ComfyUI-KJNodes/requirements.txt" --quiet
 fi
+if [ -f "$CUSTOM_NODES/ComfyUI-ReActor/requirements.txt" ]; then
+    echo "  📦 Installing ReActor dependencies (insightface)..."
+    pip install insightface onnxruntime-gpu --quiet || echo "  ⚠️ Warning: insightface compilation may have failed."
+    pip install -r "$CUSTOM_NODES/ComfyUI-ReActor/requirements.txt" --quiet
+    mkdir -p "${MODELS}/insightface"
+    echo "  📥 Checking/Resuming ReActor swap model..."
+    wget -c -q --show-progress -O "${MODELS}/insightface/inswapper_128.onnx" 'https://huggingface.co/datasets/Gourieff/ReActor/resolve/main/models/inswapper_128.onnx'
+    echo "  [SUCCESS] ReActor swap model downloaded."
+fi
+echo "[SUCCESS] Python dependencies synced."
 
 # --- Step 4: Hardware Dynamic Model Installs ---
-echo ""
-echo "[4/5] Initiating cloud model synchronization..."
+echo "[START] Step 4: Model Matrix Verification"
 
 FLUX_DIR="${MODELS}/diffusion_models/flux2"
 mkdir -p "$FLUX_DIR"
 
 if [ "$USE_FP8" = true ]; then
-    echo "  ⚠️ HARDWARE PROFILE TRIGGERED: Utilizing FP8 precision models."
+    echo "  ⚠️ Hardware Profile Triggered: FP8 Context active."
     
-    # UNET Setup
+    # UNET
     FLUX_FILE="${FLUX_DIR}/flux-2-klein-9b-kv-fp8.safetensors"
-    if [ ! -f "$FLUX_FILE" ]; then
-        wget -q --show-progress -O "$FLUX_FILE" 'https://huggingface.co/black-forest-labs/FLUX.2-klein-9b-kv-fp8/resolve/main/flux-2-klein-9b-kv-fp8.safetensors'
-    fi
+    echo "  📥 Checking/Resuming UNET model..."
+    wget -c -q --show-progress -O "$FLUX_FILE" 'https://huggingface.co/black-forest-labs/FLUX.2-klein-9b-kv-fp8/resolve/main/flux-2-klein-9b-kv-fp8.safetensors'
+    echo "  [SUCCESS] UNET downloaded and verified."
 
     # Text Encoder Setup
     CLIP_FILE="${MODELS}/text_encoders/qwen_3_8b_fp8mixed.safetensors"
-    if [ ! -f "$CLIP_FILE" ]; then
-        wget -q --show-progress -O "$CLIP_FILE" 'https://huggingface.co/Comfy-Org/flux2-klein-9B/resolve/main/split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors'
-    fi
-
+    echo "  📥 Checking/Resuming Text Encoder..."
+    wget -c -q --show-progress -O "$CLIP_FILE" 'https://huggingface.co/Comfy-Org/flux2-klein-9B/resolve/main/split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors'
+    echo "  [SUCCESS] Text Encoder downloaded."
 else
     echo "  ⚠️ Proceeding with standard FP16 tensor models."
-    # (Future-proofed automation lines for higher tier hardware...)
 fi
 
-# Universal VAE Setup
+# VAE
 VAE_FILE="${MODELS}/vae/flux2-vae.safetensors"
-if [ ! -f "$VAE_FILE" ]; then
-    wget -q --show-progress -O "$VAE_FILE" 'https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/split_files/vae/flux2-vae.safetensors'
-fi
+echo "  📥 Checking/Resuming VAE..."
+wget -c -q --show-progress -O "$VAE_FILE" 'https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/split_files/vae/flux2-vae.safetensors'
+echo "  [SUCCESS] VAE downloaded."
 
-# --- Step 5: Directory Map Setup ---
-echo ""
-echo "[5/5] Mapping blueprint destinations..."
+echo "[START] Step 5: Directory Map Setup"
 WORKFLOW_DIR="${COMFY_ROOT}/user/default/workflows/portrait_pipeline"
 mkdir -p "$WORKFLOW_DIR"
+mkdir -p "${COMFY_ROOT}/input"
+mkdir -p "${COMFY_ROOT}/output"
+echo "[SUCCESS] Directories built."
 
-echo "=============================================="
-echo "  Bootstrap Pipeline Synchronization Complete."
-echo "=============================================="
+echo "[SUCCESS] BOOTSTRAP COMPLETE"

@@ -12,6 +12,7 @@ These are the universally required repositories to run the Base Portrait Pipelin
 | **ComfyUI-Inpaint...**   | `https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git` | Lightweight logic, no heavy dependencies. |
 | **rgthree-comfy**        | `https://github.com/rgthree/rgthree-comfy.git` | Handles the visual Image Comparer QA stage. |
 | **ComfyUI-KJNodes**      | `https://github.com/kijai/ComfyUI-KJNodes.git` | Handles core utility nodes. Requires PIP dependencies. |
+| **ComfyUI-ReActor**      | `https://github.com/Gourieff/ComfyUI-ReActor.git` | Supports the ReActor-first identity preservation path. Requires `insightface` and `onnxruntime-gpu`; restart ComfyUI after install and verify ReActor node classes appear in `/object_info` before queueing ReActor workflows. |
 
 ## 2. Universal Dependency Execution
 
@@ -23,6 +24,14 @@ pip install -r requirements.txt
 
 cd <COMFY_ROOT>/custom_nodes/ComfyUI-KJNodes
 pip install -r requirements.txt
+
+pip install insightface onnxruntime-gpu
+cd <COMFY_ROOT>/custom_nodes/ComfyUI-ReActor
+pip install -r requirements.txt
+
+mkdir -p <COMFY_ROOT>/models/insightface
+wget -c -O <COMFY_ROOT>/models/insightface/inswapper_128.onnx \
+  'https://huggingface.co/datasets/Gourieff/ReActor/resolve/main/models/inswapper_128.onnx'
 ```
 
 ## 3. Workflow JSON Deployment Model

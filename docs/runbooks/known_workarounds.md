@@ -14,7 +14,7 @@
 ### 🔴 Problem: ComfyUI port `8188` already in use upon restart.
 - **Context:** Trying to restart the ComfyUI server after installing custom nodes.
 - **Cause:** SimplePod (and many cloud containers) boot ComfyUI as `PID 1` — the primary container entrypoint. Executing `kill -9 1` or force-killing python processes leads to stranded sub-processes or container looping without actually releasing the port bindings internally.
-- **✅ Resolution:** Never manual-kill the primary python instance. Authenticate with the ComfyUI API (`/auth`) using the server `.env` credentials to obtain a bearer token, and then `POST` to the `/manager/reboot` API. This initiates a graceful python-level shutdown and restart without severing the container lifecycle or orphan-locking the SQLite database.
+- **✅ Resolution:** Never manual-kill the primary python instance. On the April 11, 2026 SimplePod instance, authenticated `POST /manager/reboot` returned `405` and authenticated `GET /manager/reboot` returned `404`, so the safe path is to restart the pod/container from the provider control plane. After restart, verify `/object_info` before queueing workflows that depend on newly installed custom nodes.
 
 ## System Dependencies
 
@@ -37,7 +37,7 @@
 
 ### 🔴 Problem: MediaPipe face detection is installed but not useful for the current target
 - **Context:** `MediaPipeFaceMeshToSEGS` is installed through `ComfyUI-Impact-Pack` and appears in `/object_info`, but a Module A face-mask probe against `module0_tgt.png` produced an effectively blank mask.
-- **Cause:** The current target/template image is a stylized Spider-Man figure / masked character, not a normal human face. MediaPipe face mesh does not reliably detect the masked face region.
+- **Cause:** The original target/template image was a stylized masked superhero figure, not a normal human face. MediaPipe face mesh does not reliably detect masked or stylized face regions.
 - **✅ Resolution:** Do not spend time reinstalling MediaPipe or Impact Pack for this case. Treat MediaPipe as available but unsuitable for this target. Module A needs a more reliable target-region mask strategy: manual mask, template-specific mask, SAM with an appropriate prompt/region, or a deterministic shape/region mask verified visually.
 
 ### 🔴 Problem: Module A preview node has a mask/image type mismatch
@@ -64,3 +64,13 @@
 - **Context:** A stronger in-memory Module C pass with 12 steps, denoise `0.9`, and CFG `1.4` failed at `KSampler` with `RuntimeError: Sizes of tensors must match except in dimension 2. Expected size 1 but got size 2`.
 - **Cause:** The current `ReferenceLatent` / `InpaintModelConditioning` graph appears sensitive to the conditioning shape when CFG is increased above the known-working value.
 - **✅ Resolution:** Keep CFG at `1` for this graph until the Module C conditioning path is redesigned. A 12-step pass with CFG `1` and denoise `0.9` executed successfully, though quality remained insufficient.
+
+### 🔴 Problem: Module C local seam repair cannot fix the pasted-head architecture
+- **Context:** `moduleC_inpaint_repair_experimental.json` queued successfully on SimplePod as prompt `da191334-b30d-4858-b2ec-497a3540a38d` and produced `moduleC_inpaint_repair_experimental_00001_.png`, `moduleC_inpaint_repair_mask_00001_.png`, and `moduleC_inpaint_repair_context_00001_.png`.
+- **Cause:** The graph starts from the deterministic composite handoff and masks only the chin/collar seam. This can soften the local transition, but it cannot make the full cropped child head feel generated into the target superhero template. Separate tests with `ReferenceLatent` also failed to transfer identity reliably; available pod nodes did not include a usable PuLID, InstantID, or IPAdapter FaceID pipeline/model set.
+- **✅ Resolution:** Do not promote the seam-repair output to canonical `moduleC_harmonized.png`. Use it only as an experimental diagnostic. The proper fix is a target-space inpaint architecture with explicit identity conditioning: start from `module0_tgt.png`, use a target head/face mask, condition on `moduleB_crop.png` through a real identity adapter, and reserve crop/stitch seam repair for the final cleanup pass.
+
+### 🔴 Problem: ReActor workflow failed because of class-name and live-reload mismatch
+- **Context:** `moduleA_fast_swap.json` initially failed with `missing_node_type` for node title `ReActor Fast Swap`. The pod already had `/app/ComfyUI/custom_nodes/ComfyUI-ReActor`, but authenticated `/object_info` did not list ReActor nodes in the live process.
+- **Cause:** The workflow used `ReactorFaceSwap`, but the actual ReActor class name is `ReActorFaceSwap`. The workflow widget order also did not match the installed ReActor schema. Separately, `inswapper_128.onnx` was missing from `/app/ComfyUI/models/insightface`, and the current SimplePod ComfyUI process is PID 1 (`python main.py --listen --enable-manager`), so the Manager reboot helper did not fully reload custom nodes: authenticated `POST /manager/reboot` returned `405`, and `GET /manager/reboot` returned `404`.
+- **✅ Resolution:** Corrected `production/workflows/moduleA_fast_swap.json` to use `ReActorFaceSwap` and the installed schema. Downloaded `inswapper_128.onnx` to `/app/ComfyUI/models/insightface/inswapper_128.onnx`; standalone Python import now exposes `ReActorFaceSwap`, `ReActorFaceSwapOpt`, and related classes. Do not queue the ReActor workflow until the ComfyUI backend has had a real pod/container restart and `/object_info` confirms `ReActorFaceSwap` is present.

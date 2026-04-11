@@ -59,7 +59,7 @@ This document serves as the **Senior ComfyUI Architect's Blueprint** for transla
 ## Module C: Hybrid Harmonization (The Integration)
 **Purpose:** The critical blending block. Composites the cropped face, injects identity guidance, and inpaints the lighting.
 
-**Current verified implementation note:** The active workflow is a deterministic composite handoff, not the full AI inpaint design below. The Flux/KSampler inpaint path executed but produced a corrupted UI/screen artifact during live testing, so `production/workflows/moduleC_harmonization.json` now saves the verified `ImageCompositeMasked` output using the Module B source alpha, an oval trim mask, and `FeatherMask`. Reintroduce the inpaint path only as a separately tested redesign.
+**Current verified implementation note:** The active workflow is a deterministic composite handoff, not the full AI inpaint design below. The Flux/KSampler inpaint path executed but produced a corrupted UI/screen artifact during live testing, so `production/workflows/moduleC_harmonization.json` now saves the verified `ImageCompositeMasked` output using the Module B source alpha, an oval trim mask, and `FeatherMask`. A later `moduleC_inpaint_repair_experimental.json` crop/stitch repair run softened the local collar seam, but still left the child head visibly overlaid. Reintroduce any generative path only as a separately tested redesign with real identity conditioning.
 
 *   **Primary Nodes Required:**
     *   `LoadImage` (Loading the Module A & B tracked outputs)
@@ -76,6 +76,16 @@ This document serves as the **Senior ComfyUI Architect's Blueprint** for transla
         *   **CRITICAL VAR:** Denoise **0.55 - 0.75**. Sampler: `euler`, Scheduler: `simple`.
     5.  **Reconstruction:** `KSampler(LATENT)` -> `VAEDecode(PIXELS)` -> `InpaintStitchImproved` (fuses the high-res face back into the 1MP target).
 *   **Output Prefix:** `moduleC_composite/moduleC_harmonized`.
+
+**Corrected architecture requirement:** Seam-only inpainting is not enough for this template. The fix should move identity transfer into the masked target-space generation step instead of pasting a full cropped head and trying to repair the edge afterward.
+
+**Current C0/C1/C2 implementation status:** These labels now exist only as debug outputs in the current composite fallback graph, not as the full corrected architecture. `C0` saves the resized subject head and inverted subject alpha mask, `C1` saves the final composite mask, and `C2` saves the deterministic composite handoff. A complete corrected implementation still needs target-space face/neck/body masks plus identity-conditioned generation.
+
+*   **Required redesign path:**
+    1.  Keep `moduleC_harmonization.json` as the stable composite fallback until a better graph is verified.
+    2.  Build a separate identity-conditioned inpaint workflow that starts from `module0_tgt.png`, uses a target head/face-region mask, and conditions on `moduleB_crop.png` through a real identity adapter such as PuLID, InstantID, or IPAdapter FaceID.
+    3.  Use `InpaintCropImproved` / `InpaintStitchImproved` only for local target-space generation and final seam repair, not as the primary identity transfer mechanism.
+    4.  Promote the result to `moduleC_harmonized.png` only after visual review confirms the face is generated into the template rather than overlaid.
 
 ---
 

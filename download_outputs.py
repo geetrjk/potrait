@@ -15,11 +15,11 @@ c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 c.connect(HOST, port=PORT, username=USER, password=PWD)
 sftp = c.open_sftp()
 
-print("Listing remote /app/ComfyUI/output/")
+print("Listing remote /app/ComfyUI/output/moduleB_identity")
 try:
-    for f in sftp.listdir('/app/ComfyUI/output'):
+    for f in sftp.listdir('/app/ComfyUI/output/moduleB_identity'):
         if f.endswith('.png'):
-            remote_path = f'/app/ComfyUI/output/{f}'
+            remote_path = f'/app/ComfyUI/output/moduleB_identity/{f}'
             local_path = os.path.join(local_out_dir, f)
             print(f"Downloading {f}...")
             sftp.get(remote_path, local_path)

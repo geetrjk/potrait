@@ -11,7 +11,7 @@ You are interacting with a remote cloud instance (e.g., SimplePod, RunPod) hosti
 
 Before attempting ANY `git clone`, `pip install`, or `wget` command on a newly provisioned pod, you must accurately diagnose the hardware bounds.
 
-1. **Check the GPU:** Understand the CUDA limitations. 
+1. **Check the GPU:** Understand the CUDA limitations.
    - Execute: `nvidia-smi --query-gpu=name,memory.total --format=csv,noheader`
 2. **Check the Disk:** Ensure enough storage exists for 20GB+ models.
    - Execute: `df -h /`
@@ -34,3 +34,13 @@ If you successfully implement a new installation, uncover a pod-specific directo
 - Hardware-specific hacks go to the respective profile in `02_hardware_profiles/`.
 - Breakdowns and workarounds go to `known_workarounds.md`.
 - Reliable, idempotent deployment logic goes to `bootstrap.sh`.
+
+## Resilient Execution & Reliability Labels
+
+Due to silent SSH hanging bugs on large network downloads over `paramiko` `bash -s` pipes, all setup actions **MUST** utilize native stream loggers. The orchestration scripts have been classified for safety:
+
+1. **`[Reliability: Experimental/Deprecated]`** - `pod_ssh.py run "bash..."`: Direct bash injections over `paramiko` are unbuffered and prone to hanging silently during heavy execution.
+2. **`[Reliability: Stable]`** - `init_pod.py`: A native wrapper explicitly mapping stdout summaries without locking the stream. It validates exit statuses natively.
+
+**Working Setup Step:**
+If you need to bootstrap a new pod, simply run `python init_pod.py`. That script is perfectly reliable: it SFTPs `bootstrap.sh`, drives remote construction idempotently utilizing `wget -c`, streams results locally without consuming tokens, and securely manages exit codes.

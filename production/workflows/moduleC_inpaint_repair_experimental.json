@@ -1,0 +1,1155 @@
+{
+  "id": "moduleC-inpaint-repair-experimental-v1",
+  "revision": 0,
+  "last_node_id": 18,
+  "last_link_id": 26,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [
+        80,
+        160
+      ],
+      "size": [
+        360,
+        314
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "title": "Load Stable Composite Handoff (moduleC_harmonized)",
+      "properties": "#232",
+      "widgets_values": [
+        "moduleC_harmonized.png",
+        "image"
+      ],
+      "color": "#353"
+    },
+    {
+      "id": 2,
+      "type": "UNETLoader",
+      "pos": [
+        80,
+        540
+      ],
+      "size": [
+        500,
+        90
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            2
+          ]
+        }
+      ],
+      "title": "Load Flux 2 Klein 9B KV FP8",
+      "properties": {
+        "Node name for S&R": "UNETLoader"
+      },
+      "widgets_values": [
+        "flux2/flux-2-klein-9b-kv-fp8.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "FluxKVCache",
+      "pos": [
+        640,
+        540
+      ],
+      "size": [
+        220,
+        60
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            14
+          ]
+        }
+      ],
+      "title": "Enable KV Cache",
+      "properties": {
+        "Node name for S&R": "FluxKVCache"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 4,
+      "type": "CLIPLoader",
+      "pos": [
+        80,
+        660
+      ],
+      "size": [
+        500,
+        110
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            3
+          ]
+        }
+      ],
+      "title": "Load CLIP (Qwen 3.8B FP8)",
+      "properties": {
+        "Node name for S&R": "CLIPLoader"
+      },
+      "widgets_values": [
+        "qwen_3_8b_fp8mixed.safetensors",
+        "flux2",
+        "default"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "VAELoader",
+      "pos": [
+        80,
+        820
+      ],
+      "size": [
+        300,
+        70
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            13,
+            20
+          ]
+        }
+      ],
+      "title": "Load Flux 2 VAE",
+      "properties": {
+        "Node name for S&R": "VAELoader"
+      },
+      "widgets_values": [
+        "flux2-vae.safetensors"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncode",
+      "pos": [
+        640,
+        660
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            4,
+            5
+          ]
+        }
+      ],
+      "title": "Positive Seam-Repair Prompt",
+      "properties": "#232",
+      "widgets_values": [
+        "seamless transition between child chin and glossy superhero suit collar, preserve child face identity and smile, blend skin edge naturally into superhero suit fabric, matching lighting, no hard edge, no rectangular crop, no user interface, no screen artifact"
+      ],
+      "color": "#353"
+    },
+    {
+      "id": 7,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        1160,
+        760
+      ],
+      "size": [
+        240,
+        60
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "title": "Zero-Out Negative",
+      "properties": {
+        "Node name for S&R": "ConditioningZeroOut"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 8,
+      "type": "CreateShapeMask",
+      "pos": [
+        640,
+        180
+      ],
+      "size": [
+        360,
+        240
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "shape",
+          "type": "COMBO"
+        },
+        {
+          "name": "frames",
+          "type": "INT"
+        },
+        {
+          "name": "location_x",
+          "type": "INT"
+        },
+        {
+          "name": "location_y",
+          "type": "INT"
+        },
+        {
+          "name": "grow",
+          "type": "INT"
+        },
+        {
+          "name": "frame_width",
+          "type": "INT"
+        },
+        {
+          "name": "frame_height",
+          "type": "INT"
+        },
+        {
+          "name": "shape_width",
+          "type": "INT"
+        },
+        {
+          "name": "shape_height",
+          "type": "INT"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": [
+            6
+          ]
+        },
+        {
+          "name": "mask_inverted",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "title": "Target-Space Neck/Collar Inpaint Mask",
+      "properties": {
+        "Node name for S&R": "CreateShapeMask"
+      },
+      "widgets_values": [
+        "circle",
+        1,
+        562,
+        323,
+        0,
+        981,
+        1069,
+        310,
+        120
+      ]
+    },
+    {
+      "id": 9,
+      "type": "FeatherMask",
+      "pos": [
+        1060,
+        200
+      ],
+      "size": [
+        300,
+        160
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 6
+        },
+        {
+          "name": "left",
+          "type": "INT"
+        },
+        {
+          "name": "top",
+          "type": "INT"
+        },
+        {
+          "name": "right",
+          "type": "INT"
+        },
+        {
+          "name": "bottom",
+          "type": "INT"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            7,
+            22
+          ]
+        }
+      ],
+      "title": "Feather Inpaint Mask",
+      "properties": {
+        "Node name for S&R": "FeatherMask"
+      },
+      "widgets_values": [
+        25,
+        20,
+        25,
+        45
+      ]
+    },
+    {
+      "id": 10,
+      "type": "InpaintCropImproved",
+      "pos": [
+        1420,
+        160
+      ],
+      "size": [
+        360,
+        650
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 1
+        },
+        {
+          "name": "downscale_algorithm",
+          "type": "COMBO"
+        },
+        {
+          "name": "upscale_algorithm",
+          "type": "COMBO"
+        },
+        {
+          "name": "preresize",
+          "type": "BOOLEAN"
+        },
+        {
+          "name": "preresize_mode",
+          "type": "COMBO"
+        },
+        {
+          "name": "preresize_min_width",
+          "type": "INT"
+        },
+        {
+          "name": "preresize_min_height",
+          "type": "INT"
+        },
+        {
+          "name": "preresize_max_width",
+          "type": "INT"
+        },
+        {
+          "name": "preresize_max_height",
+          "type": "INT"
+        },
+        {
+          "name": "mask_fill_holes",
+          "type": "BOOLEAN"
+        },
+        {
+          "name": "mask_expand_pixels",
+          "type": "INT"
+        },
+        {
+          "name": "mask_invert",
+          "type": "BOOLEAN"
+        },
+        {
+          "name": "mask_blend_pixels",
+          "type": "INT"
+        },
+        {
+          "name": "mask_hipass_filter",
+          "type": "FLOAT"
+        },
+        {
+          "name": "extend_for_outpainting",
+          "type": "BOOLEAN"
+        },
+        {
+          "name": "extend_up_factor",
+          "type": "FLOAT"
+        },
+        {
+          "name": "extend_down_factor",
+          "type": "FLOAT"
+        },
+        {
+          "name": "extend_left_factor",
+          "type": "FLOAT"
+        },
+        {
+          "name": "extend_right_factor",
+          "type": "FLOAT"
+        },
+        {
+          "name": "context_from_mask_extend_factor",
+          "type": "FLOAT"
+        },
+        {
+          "name": "output_resize_to_target_size",
+          "type": "BOOLEAN"
+        },
+        {
+          "name": "output_target_width",
+          "type": "INT"
+        },
+        {
+          "name": "output_target_height",
+          "type": "INT"
+        },
+        {
+          "name": "output_padding",
+          "type": "COMBO"
+        },
+        {
+          "name": "device_mode",
+          "type": "COMBO"
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 7
+        },
+        {
+          "name": "optional_context_mask",
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "stitcher",
+          "type": "STITCHER",
+          "links": [
+            19
+          ]
+        },
+        {
+          "name": "cropped_image",
+          "type": "IMAGE",
+          "links": [
+            8,
+            23
+          ]
+        },
+        {
+          "name": "cropped_mask",
+          "type": "MASK",
+          "links": [
+            11
+          ]
+        }
+      ],
+      "title": "Crop Neck Seam for Local Inpaint",
+      "properties": {
+        "Node name for S&R": "InpaintCropImproved"
+      },
+      "widgets_values": [
+        "bilinear",
+        "bicubic",
+        false,
+        "ensure minimum resolution",
+        1024,
+        1024,
+        16384,
+        16384,
+        true,
+        16,
+        false,
+        32,
+        0.05,
+        false,
+        1,
+        1,
+        1,
+        1,
+        2.0,
+        true,
+        768,
+        768,
+        "64",
+        "gpu (much faster)"
+      ]
+    },
+    {
+      "id": 11,
+      "type": "InpaintModelConditioning",
+      "pos": [
+        1840,
+        240
+      ],
+      "size": [
+        320,
+        180
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 5
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 12
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 13
+        },
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 8
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 11
+        },
+        {
+          "name": "noise_mask",
+          "type": "BOOLEAN"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            15
+          ]
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "links": [
+            16
+          ]
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "title": "Inpaint Model Conditioning",
+      "properties": {
+        "Node name for S&R": "InpaintModelConditioning"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 12,
+      "type": "KSampler",
+      "pos": [
+        2220,
+        220
+      ],
+      "size": [
+        320,
+        280
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 14
+        },
+        {
+          "name": "seed",
+          "type": "INT"
+        },
+        {
+          "name": "steps",
+          "type": "INT"
+        },
+        {
+          "name": "cfg",
+          "type": "FLOAT"
+        },
+        {
+          "name": "sampler_name",
+          "type": "COMBO"
+        },
+        {
+          "name": "scheduler",
+          "type": "COMBO"
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 15
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 16
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 17
+        },
+        {
+          "name": "denoise",
+          "type": "FLOAT"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            18
+          ]
+        }
+      ],
+      "title": "KSampler Seam Repair",
+      "properties": "#432",
+      "widgets_values": [
+        24680,
+        "randomize",
+        14,
+        1.0,
+        "euler",
+        "simple",
+        0.3
+      ],
+      "color": "#653"
+    },
+    {
+      "id": 13,
+      "type": "VAEDecode",
+      "pos": [
+        2600,
+        240
+      ],
+      "size": [
+        160,
+        80
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 18
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            26
+          ]
+        }
+      ],
+      "title": "Decode Local Inpaint",
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 14,
+      "type": "InpaintStitchImproved",
+      "pos": [
+        2820,
+        240
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "stitcher",
+          "type": "STITCHER",
+          "link": 19
+        },
+        {
+          "name": "inpainted_image",
+          "type": "IMAGE",
+          "link": 26
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            24
+          ]
+        }
+      ],
+      "title": "Stitch Local Inpaint Back",
+      "properties": {
+        "Node name for S&R": "InpaintStitchImproved"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 15,
+      "type": "SaveImage",
+      "pos": [
+        3100,
+        240
+      ],
+      "size": [
+        360,
+        100
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 24
+        }
+      ],
+      "outputs": [],
+      "title": "Save Experimental Inpaint Repair",
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "moduleC_composite/moduleC_inpaint_repair_experimental"
+      ]
+    },
+    {
+      "id": 16,
+      "type": "MaskToImage",
+      "pos": [
+        1060,
+        420
+      ],
+      "size": [
+        240,
+        100
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 22
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            25
+          ]
+        }
+      ],
+      "title": "Visualize Inpaint Mask",
+      "properties": {
+        "Node name for S&R": "MaskToImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 17,
+      "type": "SaveImage",
+      "pos": [
+        1360,
+        920
+      ],
+      "size": [
+        360,
+        100
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 25
+        }
+      ],
+      "outputs": [],
+      "title": "Save Inpaint Mask Visual",
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "moduleC_composite/moduleC_inpaint_repair_mask"
+      ]
+    },
+    {
+      "id": 18,
+      "type": "SaveImage",
+      "pos": [
+        1840,
+        520
+      ],
+      "size": [
+        360,
+        100
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 23
+        }
+      ],
+      "outputs": [],
+      "title": "Save Cropped Inpaint Context",
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "moduleC_composite/moduleC_inpaint_repair_context"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      10,
+      0,
+      "IMAGE"
+    ],
+    [
+      2,
+      2,
+      0,
+      3,
+      0,
+      "MODEL"
+    ],
+    [
+      3,
+      4,
+      0,
+      6,
+      0,
+      "CLIP"
+    ],
+    [
+      4,
+      6,
+      0,
+      7,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      5,
+      6,
+      0,
+      11,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      6,
+      8,
+      0,
+      9,
+      0,
+      "MASK"
+    ],
+    [
+      7,
+      9,
+      0,
+      10,
+      25,
+      "MASK"
+    ],
+    [
+      8,
+      10,
+      1,
+      11,
+      3,
+      "IMAGE"
+    ],
+    [
+      11,
+      10,
+      2,
+      11,
+      4,
+      "MASK"
+    ],
+    [
+      12,
+      7,
+      0,
+      11,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      13,
+      5,
+      0,
+      11,
+      2,
+      "VAE"
+    ],
+    [
+      14,
+      3,
+      0,
+      12,
+      0,
+      "MODEL"
+    ],
+    [
+      15,
+      11,
+      0,
+      12,
+      6,
+      "CONDITIONING"
+    ],
+    [
+      16,
+      11,
+      1,
+      12,
+      7,
+      "CONDITIONING"
+    ],
+    [
+      17,
+      11,
+      2,
+      12,
+      8,
+      "LATENT"
+    ],
+    [
+      18,
+      12,
+      0,
+      13,
+      0,
+      "LATENT"
+    ],
+    [
+      19,
+      10,
+      0,
+      14,
+      0,
+      "STITCHER"
+    ],
+    [
+      20,
+      5,
+      0,
+      13,
+      1,
+      "VAE"
+    ],
+    [
+      26,
+      13,
+      0,
+      14,
+      1,
+      "IMAGE"
+    ],
+    [
+      22,
+      9,
+      0,
+      16,
+      0,
+      "MASK"
+    ],
+    [
+      23,
+      10,
+      1,
+      18,
+      0,
+      "IMAGE"
+    ],
+    [
+      24,
+      14,
+      0,
+      15,
+      0,
+      "IMAGE"
+    ],
+    [
+      25,
+      16,
+      0,
+      17,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Module C Experimental: Local Seam Inpaint Repair",
+      "bounding": [
+        40,
+        100,
+        3500,
+        960
+      ],
+      "color": "#704c2b",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.45,
+      "offset": [
+        20,
+        40
+      ]
+    }
+  },
+  "version": 0.4
+}

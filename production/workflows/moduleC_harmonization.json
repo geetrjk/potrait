@@ -1,8 +1,8 @@
 {
   "id": "moduleC-composite-handoff-v4",
   "revision": 3,
-  "last_node_id": 34,
-  "last_link_id": 48,
+  "last_node_id": 39,
+  "last_link_id": 53,
   "nodes": [
     {
       "id": 1,
@@ -265,8 +265,8 @@
         "Node name for S&R": "ResizeMask"
       },
       "widgets_values": [
+        380,
         335,
-        296,
         false,
         "lanczos",
         "disabled"
@@ -298,7 +298,8 @@
           "name": "MASK",
           "type": "MASK",
           "links": [
-            42
+            42,
+            50
           ]
         }
       ],
@@ -350,7 +351,8 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            7
+            7,
+            49
           ]
         }
       ],
@@ -360,8 +362,8 @@
       },
       "widgets_values": [
         "lanczos",
+        380,
         335,
-        296,
         "disabled"
       ]
     },
@@ -438,13 +440,13 @@
       "widgets_values": [
         "circle",
         1,
-        168,
-        146,
+        190,
+        166,
         0,
+        380,
         335,
-        296,
-        320,
-        270
+        370,
+        315
       ]
     },
     {
@@ -610,7 +612,8 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            46
+            46,
+            53
           ]
         }
       ],
@@ -619,8 +622,8 @@
         "Node name for S&R": "ImageCompositeMasked"
       },
       "widgets_values": [
-        395,
-        20,
+        350,
+        75,
         false
       ]
     },
@@ -650,7 +653,8 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            48
+            48,
+            52
           ]
         }
       ],
@@ -716,6 +720,162 @@
       },
       "widgets_values": [
         "moduleC_composite/moduleC_harmonized"
+      ]
+    },
+    {
+      "id": 35,
+      "type": "SaveImage",
+      "pos": [
+        1260,
+        500
+      ],
+      "size": [
+        360,
+        100
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 49
+        }
+      ],
+      "outputs": [],
+      "title": "Save C0 Resized Subject Head Debug",
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "moduleC_debug/moduleC_C0_resized_subject_head"
+      ]
+    },
+    {
+      "id": 36,
+      "type": "MaskToImage",
+      "pos": [
+        1260,
+        720
+      ],
+      "size": [
+        240,
+        100
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 50
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            51
+          ]
+        }
+      ],
+      "title": "Visualize C0 Inverted Subject Alpha Mask",
+      "properties": {
+        "Node name for S&R": "MaskToImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 37,
+      "type": "SaveImage",
+      "pos": [
+        1540,
+        720
+      ],
+      "size": [
+        360,
+        100
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 51
+        }
+      ],
+      "outputs": [],
+      "title": "Save C0 Inverted Subject Alpha Mask Debug",
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "moduleC_debug/moduleC_C0_subject_alpha_inverted_mask"
+      ]
+    },
+    {
+      "id": 38,
+      "type": "SaveImage",
+      "pos": [
+        1540,
+        940
+      ],
+      "size": [
+        360,
+        100
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 52
+        }
+      ],
+      "outputs": [],
+      "title": "Save C1 Final Composite Mask Debug",
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "moduleC_debug/moduleC_C1_final_composite_mask"
+      ]
+    },
+    {
+      "id": 39,
+      "type": "SaveImage",
+      "pos": [
+        2520,
+        420
+      ],
+      "size": [
+        360,
+        100
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 53
+        }
+      ],
+      "outputs": [],
+      "title": "Save C2 Composite Handoff Debug",
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "moduleC_debug/moduleC_C2_composite_handoff"
       ]
     }
   ],
@@ -829,6 +989,46 @@
       30,
       0,
       31,
+      0,
+      "IMAGE"
+    ],
+    [
+      49,
+      7,
+      0,
+      35,
+      0,
+      "IMAGE"
+    ],
+    [
+      50,
+      6,
+      0,
+      36,
+      0,
+      "MASK"
+    ],
+    [
+      51,
+      36,
+      0,
+      37,
+      0,
+      "IMAGE"
+    ],
+    [
+      52,
+      30,
+      0,
+      38,
+      0,
+      "IMAGE"
+    ],
+    [
+      53,
+      8,
+      0,
+      39,
       0,
       "IMAGE"
     ]
